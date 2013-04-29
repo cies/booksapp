@@ -2,7 +2,7 @@
 
 Example application of a modern day client-server app.
 
-[Demo of the client](https://cies.github.io/booksapp) hooking
+[Demo of the client](http://cies.github.io/booksapp) hooking
 directly into the Google Books API, thus not using the supplied
 proxy server.
 
