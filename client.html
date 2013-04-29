@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BooksApp</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+  <script src="https://raw.github.com/BinaryMuse/ngInfiniteScroll/master/build/ng-infinite-scroll.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+  <script>
+// TODO: raw html in description (textSnippet), sorting/rating/mashup/amazon/...? 
+var booksApp = angular.module('booksApp', ['infinite-scroll']);
+booksApp.controller('MainController', function($scope, $http) {
+  $scope.items = [];
+  $scope.busy = false;
+  $scope.searchQuery = 'ruby+rails';
+  $scope.nextPage = function() {
+    if ($scope.busy) return;
+    $scope.busy = true;
+    var url = "http://0.0.0.0:3000/books/v1/volumes?q=" + $scope.searchQuery + "&maxResults=40&startIndex=" + $scope.items.length;
+    $http.get(url).success(function(new_items) {
+      for (var i = 0; i < new_items.length; i++) $scope.items.push(new_items[i]);
+      $scope.busy = false;
+    });
+  };
+  $scope.newSearch = function() {
+    $scope.searchQuery = $('form.navbar-search input').val().replace(' ', '+');
+    $scope.items = [];
+    $scope.nextPage();
+  };
+});
+  </script>
+  <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+  <style>
+.content { margin-top: 4em; }
+.book { padding: 0.5em 1em 0.5em 1em; margin: -1em; }
+.book:hover { background-color: #fafaff; }
+.book img { float: right; padding-left: 1em; padding-bottom: 1em; }
+.book h2 { margin-bottom: -2px; }
+.subtitle { disply: block; font-size: 150%; font-weight: 200; }
+.authors { font-style: italic; }
+  </style>
+</head>
+<body ng-app='booksApp' ng-controller='MainController'>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container"> 
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a> 
+      <a class="brand" href="#">BooksApp</a>
+      <form class="navbar-search pull-left" ng-submit='newSearch()'><input type="text" class="search-query" placeholder="Search books"></form>
+      <div class="nav-collapse">
+        <ul class="nav"><li><a href="http://escort.nl">Paid plans</a></li><li><a href="http://god.com">FAQ</a></li><li><a href="http://relatieplanet.nl">Contact</a></li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class='content container'>
+  <div infinite-scroll='nextPage()' infinite-scroll-disabled='busy' infinite-scroll-distance='6'>
+    <div ng-repeat='item in items' class='book'>
+      <a ng-href='{{item.webReaderLink}}' target='_blank'><img src='{{item.imageLinks.thumbnail}}' title='Cover of {{item.title}}' width='128' /></a>
+      <h2><a ng-href='{{item.webReaderLink}}' target='_blank'>{{item.title}}</a></h2>
+      <span class='subtitle'>{{item.subtitle}}</span>
+      <div class='details'>
+        <span class='authors'>by {{item.authors.slice(0, -1).join(', ')}} {{((item.authors.length > 1) && 'and' || '')}}
+                                 {{item.authors.slice(-1)[0]}}</span>
+        <span class='extra muted'> &mdash; {{item.publishedDate.split('-')[0]}}, {{item.publisher}}, {{item.pageCount}} pages</span>
+      </div>
+      <p class='description'>{{item.textSnippet}}</p>
+      <div style='clear: both;'></div>
+    </div>
+    <div ng-show='busy'>Loading more entries...</div>
+  </div>
+</div>
+</body>
+</html>

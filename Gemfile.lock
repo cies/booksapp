@@ -1,0 +1,22 @@
+GEM
+  specs:
+    daemons (1.1.9)
+    dalli (2.6.2)
+    eventmachine (1.0.3)
+    json (1.7.7)
+    rack (1.5.2)
+    rack-cache (1.2)
+      rack (>= 0.4)
+    thin (1.5.1)
+      daemons (>= 1.0.9)
+      eventmachine (>= 0.12.6)
+      rack (>= 1.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  dalli
+  json
+  rack-cache
+  thin
